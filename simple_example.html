@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+	<head>
+		<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+		<title>Быки и коровы</title>
+	</head>
+	<body>
+		<script type="text/javascript">
+		var taskId = '7ee227fb-ba62-4303-b236-fd0a3a94275c';
+  
+		function showInfo(text) {
+			var infoBox = $("pre#infoBox");
+			infoBox.html(text);
+			infoBox.show();
+		}
+ 
+		function parseResponse(data) { 
+			if (!data) {
+				return;
+			}
+ 
+			if (data.errorMessage) {
+				showInfo(data.errorMessage);
+				if (data.isUserError) {
+					$("div#bcGameUserId").show();
+				}
+				return;
+			}
+   
+			var table = $('table#task');
+			table.children().remove();
+			table.append('<tr><th>Слово</th><th>Результат</th></tr>');
+	
+			if (data.code) {
+				var codeElement = $("pre#code");
+				codeElement.html('Ваш код: ' + data.code);
+				codeElement.show();
+			}
+	
+			if (data.answers) {
+				$.each(data.answers,
+					function(index, value){
+						table.append('<tr><td>' + value.answer + '</td><td>' + value.result + '</td></tr>');
+					}
+				);
+			}
+		}
+ 
+		function onTestClick() {
+			$("div#bcGameUserId").hide();
+			$("pre#infoBox").hide();
+			$("pre#code").hide();
+			$("img#loading-indicator").show();
+			try {
+				$.ajax( 
+					{ 
+						url: "http://nzhegalin.appspot.com/game",
+						dataType: "jsonp",
+						jsonpCallback: "parseResponse",
+						data : 
+							{ 
+								word : function() { return $("input#word").val(); },
+								user : function() { return $("input#user").val(); },
+								task : taskId 
+							},
+						complete : function (jqXHR, textStatus) { $("img#loading-indicator").hide(); }
+					}
+				);
+			} catch (err) {
+				showInfo('Произошел непредвиденный сбой');
+			}
+			$("input#word").val('');
+		}
+		</script>
+ 
+		<div class="spacer"></div> 
+		<table id="task">
+			<tbody>
+				<tr><th>Слово</th><th>Результат</th></tr>
+			</tbody>
+		</table>
+		<div class="spacer"></div>
+		<input type="text" id="word" name="word" size="40" style="width:auto;"/>
+		<input type="button" id="submitWord" onclick="onTestClick()" value="Проверить" style="width:auto;"/>
+		<div class="spacer"></div>
+		<div style="border-width:1px;border-style:solid;padding:10px 20px">
+			<img src="http://nzhegalin.appspot.com/ajax-loader.gif" id="loading-indicator"/>
+			<div id="bcGameUserId">
+				<input type="text" id="user" name="user" size="40" style="width:auto;" hint="Введите ваш идентификатор">
+				<input type="button" onclick="$('input#word').val(''); onTestClick()" value="OK" style="width:auto;"/>
+			</div>
+			<pre id="code"></pre>
+			<pre id="infoBox"></pre>
+		</div>
+		<script type="text/javascript">
+		$("input#word").keyup(function(event) {
+			if(event.keyCode == 13) {
+				$("input#submitWord").click();
+			}
+		});
+		onTestClick();
+		</script>

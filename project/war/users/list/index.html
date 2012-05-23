@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- The HTML 4.01 Transitional DOCTYPE declaration-->
+<!-- above set at the top of the file will set     -->
+<!-- the browser's rendering engine into           -->
+<!-- "Quirks Mode". Replacing this declaration     -->
+<!-- with a "Standards Mode" doctype is supported, -->
+<!-- but may lead to some differences in layout.   -->
+
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <title>Пользователи</title>
+    <style type="text/css">
+   table, tr, td, th { 
+    border: 1px solid blue
+   }
+  </style>
+  </head> 
+  <body>
+   <img src="/ajax-loader.gif" id="loading-indicator"/>
+  <table id="allUsers">
+  </table>
+  <script type="text/javascript">
+  
+	var usersTable =  $("#allUsers");
+	usersTable.html('');
+  $.ajax('/users', { data : { action : 'getAll' }, complete : function (jqXHR, textStatus) { $("img#loading-indicator").hide(); }, success: function(data, textStatus, jqXHR){$.each(data, function(index, value){usersTable.append('<tr><td>' + value.uid + '</td><td>' + value.name + '</td></tr>');});}});
+  
+  
+  
+  </script>
+     
+  </body>
+</html>
